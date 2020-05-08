@@ -205,39 +205,12 @@ meteo_2 <- data.frame(dates = unique_dates,
                       p_station_0, p_station_3, p_station_6, p_station_9,
                       p_station_12, p_station_15, p_station_18, p_station_21) 
 
-#### ДОБАВЛЕНИЕ ПЕРЕМЕННЫХ ОТСУТСТВУЮЩИХ В ПЕРВОНАЧАЛЬНОМ НАБОРЕ ####
-
-# Добавление столбца с признаком выходных дней (0 - рабочий, 1 - выходной день)
-weekends <- format(meteo_2$dates, format="%a")
-weekends[weekends != c("Сб", "Вс")] <- 0
-weekends[weekends == c("Сб", "Вс")] <- 1
-meteo_2 <- tibble::add_column(meteo_2, weekends, .after = "dates")
-
-# Добавление столбца со средней суточной температурой
-T_avg <- apply(meteo_2[,2:9], 1, mean)
-T_avg <- round(T_avg, digits = 1)
-meteo_2 <- tibble::add_column(meteo_2, T_avg, .after = "T_min")
-
-# Добавление столбца со средней скоростью ветра ночью
-w_speed_avg_night <- apply(meteo_2[,c(37, 38, 43,45)], 1, mean)
-w_speed_avg_night <- round(w_speed_avg_night, digits = 1)
-meteo_2 <- add_column(meteo_2, w_speed_avg_night,
-                      .after = "w_speed_21")
-
-# Добавление столбца со средней скоростью ветра днем
-w_speed_avg_day <- apply(meteo_2[,c(39:42)], 1, mean)
-w_speed_avg_day <- round(w_speed_avg_day, digits = 1)
-meteo_2 <- add_column(meteo_2, w_speed_avg_day,
-                      .after = "w_speed_avg_night")
-
 # Сохранение набора метеорологических данных в файл CSV
 file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
                    "/Разработка прогностической схемы (Вологда)/Datasets/meteo_2.csv",
                    sep = "")
 readr::write_csv(meteo_2, file_path)
 
-# Удаление лишних объектов из памяти
-rm(list = ls()[c(1:11, 13:88)])
 
 #### СОЗДАНИЕ НАБОРА АЭРОЛОГИЧЕСКИХ ДАННЫХ ####
 
@@ -269,8 +242,6 @@ file_path <- paste("C:/Изменение климата и загрязнени
                    sep = "")
 readr::write_csv(aero, file_path)
 
-# Удаление лишних объектов из памяти
-rm(list = ls()[2])
 
 #### СОЗДАНИЕ ОБЪЕДИНЕННОГО НАБОРА ДАННЫХ ####
 # С ДОБАВЛЕНИЕМ ЕЖЕДНЕВНЫХ ЗНАЧЕНИЙ ПАРАМЕТРА Р
@@ -293,7 +264,7 @@ names(parametr_P)[2] <- "P"
 working_dataset <- merge(meteo_2, aero)
 
 # Добавление переменной с параметром Р
-working_dataset <- add_column(working_dataset,
+working_dataset <- tibble::add_column(working_dataset,
                               P = parametr_P$P, .after = "dates" )
 
 # Создание вектора со значениями параметра Р в предыдущий день
@@ -301,7 +272,7 @@ prev_P <- working_dataset$P[1:1825]
 prev_P <- c(NA, prev_P)
 
 # Добавление переменной с параметром Р в предыдущий день
-working_dataset <- add_column(working_dataset, P_prev = prev_P, .after = "P" )
+working_dataset <- tibble::add_column(working_dataset, P_prev = prev_P, .after = "P" )
 
 # Сохранение объединенного набора данных
 file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
@@ -310,5 +281,50 @@ file_path <- paste("C:/Изменение климата и загрязнени
                    sep = "")
 readr::write_csv(working_dataset, file_path)
 
-# Удаление лишних объектов из памяти
-rm(list = ls()[1:5])
+
+#### ДОБАВЛЕНИЕ ПЕРЕМЕННЫХ ОТСУТСТВУЮЩИХ В ПЕРВОНАЧАЛЬНОМ НАБОРЕ ####
+
+# Импорт набора данных 
+file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
+                   "/Разработка прогностической схемы (Вологда)",
+                   "/Datasets/working_dataset.csv", sep = "")
+working_dataset <- read.table(file_path, header = TRUE, sep = ",",
+                              stringsAsFactors = FALSE)
+
+working_dataset$dates <- as.Date(working_dataset$dates)
+
+# Добавление столбца с признаком выходных дней (0 - рабочий, 1 - выходной день)
+weekends <- format(working_dataset$dates, format="%a")
+weekends[weekends != "Сб" & weekends != "Вс"] <- 0
+weekends[weekends == "Сб" | weekends == "Вс"] <- 1
+weekends <- as.factor(weekends)
+working_dataset <- tibble::add_column(working_dataset,
+                                      weekends, .after = "dates")
+
+# Добавление столбца со средней суточной температурой
+T_avg <- apply(working_dataset[,5:12], 1, mean)
+T_avg <- round(T_avg, digits = 1)
+working_dataset <- tibble::add_column(working_dataset,
+                                      T_avg, .after = "T_min")
+
+# Добавление столбца со средней скоростью ветра ночью
+w_speed_avg_night <- apply(working_dataset[,c(40, 41, 46, 47)],
+                           1, mean)
+w_speed_avg_night <- round(w_speed_avg_night, digits = 1)
+working_dataset <- tibble::add_column(working_dataset,
+                                      w_speed_avg_night,
+                                      .after = "w_speed_21")
+
+# Добавление столбца со средней скоростью ветра днем
+w_speed_avg_day <- apply(working_dataset[,c(42:45)], 1, mean)
+w_speed_avg_day <- round(w_speed_avg_day, digits = 1)
+working_dataset <- tibble::add_column(working_dataset,
+                                      w_speed_avg_day,
+                                      .after = "w_speed_avg_night")
+
+#### Сохранение окончательного набора данных ####
+file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
+                   "/Разработка прогностической схемы (Вологда)",
+                   "/Datasets/working_dataset.csv",
+                   sep = "")
+readr::write_csv(working_dataset, file_path)
