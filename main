@@ -293,7 +293,7 @@ working_dataset <- read.table(file_path, header = TRUE, sep = ",",
 
 working_dataset$dates <- as.Date(working_dataset$dates)
 
-# Добавление столбца с признаком выходных дней (0 - рабочий, 1 - выходной день)
+# (ДОБАВЛЕНО) Добавление столбца с признаком выходных дней (0 - рабочий, 1 - выходной день) 
 weekends <- format(working_dataset$dates, format="%a")
 weekends[weekends != "Сб" & weekends != "Вс"] <- 0
 weekends[weekends == "Сб" | weekends == "Вс"] <- 1
@@ -301,13 +301,13 @@ weekends <- as.factor(weekends)
 working_dataset <- tibble::add_column(working_dataset,
                                       weekends, .after = "dates")
 
-# Добавление столбца со средней суточной температурой
+# (ДОБАВЛЕНО) Добавление столбца со средней суточной температурой
 T_avg <- apply(working_dataset[,5:12], 1, mean)
 T_avg <- round(T_avg, digits = 1)
 working_dataset <- tibble::add_column(working_dataset,
                                       T_avg, .after = "T_min")
 
-# Добавление столбца со средней скоростью ветра ночью
+# (ДОБАВЛЕНО) Добавление столбца со средней скоростью ветра ночью
 w_speed_avg_night <- apply(working_dataset[,c(40, 41, 46, 47)],
                            1, mean)
 w_speed_avg_night <- round(w_speed_avg_night, digits = 1)
@@ -315,12 +315,76 @@ working_dataset <- tibble::add_column(working_dataset,
                                       w_speed_avg_night,
                                       .after = "w_speed_21")
 
-# Добавление столбца со средней скоростью ветра днем
+# (ДОБАВЛЕНО) Добавление столбца со средней скоростью ветра днем
 w_speed_avg_day <- apply(working_dataset[,c(42:45)], 1, mean)
 w_speed_avg_day <- round(w_speed_avg_day, digits = 1)
 working_dataset <- tibble::add_column(working_dataset,
                                       w_speed_avg_day,
                                       .after = "w_speed_avg_night")
+
+# (ДОБАВЛЕНО) Добавление столбца со средней суточной скоростью ветра
+w_speed_avg <- apply(working_dataset[,c(40:47)], 1, mean)
+w_speed_avg <- round(w_speed_avg, digits = 1)
+working_dataset <- tibble::add_column(working_dataset,
+                                      w_speed_avg,
+                                      .after = "w_speed_avg_day")
+
+# (ДОБАВЛЕНО) Добавление столбца со средней суточной влажностью воздуха
+humidity_avg <- apply(working_dataset[,c(69:76)], 1, mean)
+humidity_avg <- round(humidity_avg, digits = 1)
+working_dataset <- tibble::add_column(working_dataset,
+                                      humidity_avg,
+                                      .after = "humidity_21")
+
+# (ДОБАВЛЕНО) Добавление столбца со средним суточным атмосферным давлением на уровне станции
+p_station_avg <- apply(working_dataset[,c(78:85)], 1, mean)
+p_station_avg <- round(p_station_avg, digits = 1)
+working_dataset <- tibble::add_column(working_dataset,
+                                      p_station_avg,
+                                      .after = "p_station_21")
+
+# (ДОБАВЛЕНО) Добавление столбца со средней суточной скоростью ветра на уровне 925 мб
+v_925_avg <- apply(working_dataset[,c(93:94)], 1, mean)
+v_925_avg <- round(v_925_avg, digits = 1)
+working_dataset <- tibble::add_column(working_dataset,
+                                      v_925_avg,
+                                      .after = "v_925_12")
+
+# Функция для определения среднего направления ветра
+mean_direction <- function(x) {
+  # Перевод из полярной в декартову систему координат
+  # Координаты каждой точки X [xi, yi] = [sin(Xi), cos(Xi)]
+  # Для перевода из градусов в радианы значения X умножаются на pi/180
+  sinuses <- sin(x * pi / 180)
+  cosines <- cos(x * pi / 180)
+  
+  # Находится средний синус и средний косинус всех точек X 
+  sinuses_avg <- mean(sinuses)
+  cosines_avg <- mean(cosines)
+  
+  # Перевод из декартовых в полярные координаты
+  result <- ifelse(sinuses_avg < 0 & cosines_avg > 0,
+                   atan(sinuses_avg/cosines_avg) * (180/pi) + 360,
+                   ifelse(cosines_avg < 0,
+                          atan(sinuses_avg/cosines_avg) * (180/pi) + 180,
+                          atan(sinuses_avg/cosines_avg) * (180/pi)))
+  return(round(result, digits = 1))
+}
+
+# (ДОБАВЛЕНО) Добавление столбца со средним суточным направлением ветра на уровне 925 мб
+d_925_avg <- apply(working_dataset[,c(91:92)], 1, mean_direction)
+d_925_avg <- round(d_925_avg, digits = 1)
+working_dataset <- tibble::add_column(working_dataset,
+                                      d_925_avg,
+                                      .after = "d_925_12")
+
+# (ДОБАВЛЕНО) Добавление столбца со средним суточным направлением ветра на уровне станции
+w_direct_avg <- apply(working_dataset[,c(32:39)], 1, mean_direction)
+w_direct_avg <- round(w_direct_avg, digits = 1)
+working_dataset <- tibble::add_column(working_dataset,
+                                      w_direct_avg,
+                                      .after = "w_direct_21")
+
 
 #### Сохранение окончательного набора данных ####
 file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
