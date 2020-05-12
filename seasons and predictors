@@ -1,0 +1,148 @@
+# сОЗДАНИЕ НАБОРОВ ДАННЫХ ДЛЯ ТЕПЛОГО (МАЙ-СЕНТЯБРЬ) И ХОЛОДНОГО 
+# (ОКТЯБРЬ-АПРЕЛЬ) ПЕРИОДОВ
+
+# Импорт набора данных 
+file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
+                   "/Разработка прогностической схемы (Вологда)",
+                   "/Datasets/working_dataset.csv", sep = "")
+working_dataset <- read.table(file_path, header = TRUE, sep = ",",
+                              stringsAsFactors = FALSE)
+
+working_dataset$dates <- as.Date(working_dataset$dates)
+
+# Создание набора данных для теплого периода
+
+summer_dataset_NA <- working_dataset[format(working_dataset$dates, "%m") >= "05" &
+                                     format(working_dataset$dates, "%m") <= "09", ]
+
+summer_dataset <- na.omit(summer_dataset_NA) # Удаление всех пропущенных значений
+
+
+# Создание набора данных для холодного периода
+
+winter_dataset_NA <- working_dataset[format(working_dataset$dates, "%m") >= "10" |
+                                     format(working_dataset$dates, "%m") <= "04", ]
+
+winter_dataset <- na.omit(winter_dataset_NA) # Удаление всех пропущенных значений
+
+
+
+# ПРЕОБРАЗОВАНИЕ ПРЕДИКТОРОВ (расчет среднего значения параметра Р для
+# различных градаций значений исходных предикоров)
+
+# Функция для расчета средних значений параметра Р для различных градаций
+# предикторов
+# Функция принимает таблицу с данными (season), название предиктора (predictor)
+# из таблицы season, минималное и максимлаьное значения градации (min и max), 
+# а также величину шага между градациями (step)
+# Возвращает вектор со средними значениями параметра Р
+# average <- function(season, predictor, min, max, step){
+#   result <- mean(season[season[predictor] <= min, "P"])
+#   i <- 0
+#   while (i <= max - min - step){
+#     result <- c(result, mean(season[season[predictor]   > min + i &
+#                                       season[predictor]   <= min + i + step, "P"]))
+#     i <- i + step
+#   }
+#   result <- c(result, mean(season[season[predictor] > max, "P"]))
+#   return(result)
+# }
+
+# Второй вариант: возвращает таблицу преобразованных предикторов
+average <- function(season, seasonName, predictor, min, max, step){
+  result <- mean(season[season[predictor] <= min, "P"])
+  i <- 0
+  while (i <= max - min - step){
+    result <- c(result, mean(season[season[predictor]   > min + i &
+                                      season[predictor]   <= min + i + step, "P"]))
+    i <- i + step
+  }
+  result <- c(result, mean(season[season[predictor] > max, "P"]))
+  result <- data.frame(season = seasonName,
+                       pred = predictor <- rep(predictor, length(result)),
+                       start = start <- as.numeric(c("",seq(min, max, step))),
+                       end = end <- as.numeric(c(seq(min, max, step), "")),
+                       P = P <- round(result, digits = 3),
+                       stringsAsFactors = FALSE)
+  return(result)
+}
+
+# Функция для создания преобразованных предикторов
+# Функция принимает таблицу с данными (season), название предиктора (predictor)
+# Возвращает вектор со значениями параметра P вместо значений метеовеличин
+# Из промежуточных значений вычитается 10^5 для корректного присвоения значений
+# параметра Р
+transformed_meteo <- function(season, seasonName, predictor){
+  result <- season[predictor]
+  predictors_work <- predictors[predictors$season == seasonName &
+                                predictors$pred == predictor, 4:5]
+  result[result <= predictors_work$end[1]] <- predictors_work[1,2] - 10^5
+  i <- 1
+  while (i <= length(predictors_work$end)-2){
+    result[result > predictors_work$end[i] & 
+             result <= predictors_work$end[i+1]] <- predictors_work[i+1,2] - 10^5
+    i <- i + 1
+  }
+  result[result > predictors_work$end[i]] <- predictors_work[i+1,2]  - 10^5
+  result <- result + 10^5
+  return(as.vector(result[,1]))
+}
+
+# Летний период. Без учета пропущенных значений
+season <- summer_dataset
+
+# Вычисление значений преобразованных предикторов
+assign(paste("t_0", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "t_0",
+               min = 0, max = 15, step = 5))
+
+assign(paste("t_3", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "t_3",
+               min = 0, max = 15, step = 5))
+
+assign(paste("t_6", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "t_6",
+               min = 5, max = 20, step = 5))
+
+assign(paste("t_9", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "t_9",
+               min = 5, max = 25, step = 5))
+
+assign(paste("t_12", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "t_12",
+               min = 5, max = 25, step = 5))
+
+assign(paste("t_15", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "t_15",
+               min = 5, max = 25, step = 5))
+
+assign(paste("t_18", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "t_18",
+               min = 5, max = 20, step = 5))
+
+assign(paste("t_21", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "t_21",
+               min = 0, max = 15, step = 5))
+
+assign(paste("T_max", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "T_max",
+               min = 10, max = 25, step = 5))
+
+assign(paste("T_min", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "T_min",
+               min = 0, max = 15, step = 5))
+
+assign(paste("T_avg", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "T_avg",
+               min = 5, max = 20, step = 5))
+
+# Создание объединенной таблицы значений преобразованных предикторов
+predictors <- rbind(t_0_mean, t_3_mean, t_6_mean, t_9_mean, t_12_mean,
+                    t_15_mean, t_18_mean, t_21_mean, T_max_mean, T_min_mean,
+                    T_avg_mean)
+
+# Удаление лишних переменных
+rm(t_0_mean, t_3_mean, t_6_mean, t_9_mean, t_12_mean,
+   t_15_mean, t_18_mean, t_21_mean, T_max_mean, T_min_mean,
+   T_avg_mean)
+
