@@ -384,6 +384,23 @@ w_direct_avg <- round(w_direct_avg, digits = 1)
 working_dataset <- tibble::add_column(working_dataset,
                                       w_direct_avg,
                                       .after = "w_direct_21")
+                                      
+
+# (ДОБАВЛЕНО) Добавление столбца с разностью температуры на уровне станции и АТ-925
+# за 00 UTC
+t_diff_0 <- working_dataset$t_0 - working_dataset$t_925_0
+t_diff_0 <- round(t_diff_0, digits = 1)
+working_dataset <- tibble::add_column(working_dataset,
+                                      t_diff_0,
+                                      .after = "h_500_1000_12")
+
+# (ДОБАВЛЕНО) Добавление столбца с разностью температуры на уровне станции и АТ-925
+# за 12 UTC
+t_diff_12 <- working_dataset$t_12 - working_dataset$t_925_12
+t_diff_12 <- round(t_diff_12, digits = 1)
+working_dataset <- tibble::add_column(working_dataset,
+                                      t_diff_12,
+                                      .after = "t_diff_0")
 
 
 #### Сохранение окончательного набора данных ####
