@@ -384,7 +384,6 @@ w_direct_avg <- round(w_direct_avg, digits = 1)
 working_dataset <- tibble::add_column(working_dataset,
                                       w_direct_avg,
                                       .after = "w_direct_21")
-                                      
 
 # (ДОБАВЛЕНО) Добавление столбца с разностью температуры на уровне станции и АТ-925
 # за 00 UTC
@@ -397,10 +396,82 @@ working_dataset <- tibble::add_column(working_dataset,
 # (ДОБАВЛЕНО) Добавление столбца с разностью температуры на уровне станции и АТ-925
 # за 12 UTC
 t_diff_12 <- working_dataset$t_12 - working_dataset$t_925_12
-t_diff_12 <- round(t_diff_12, digits = 1)
+hit_diff_12 <- round(t_diff_12, digits = 1)
 working_dataset <- tibble::add_column(working_dataset,
                                       t_diff_12,
                                       .after = "t_diff_0")
+
+# (ДОБАВЛЕНО) Добавление столбца с изменением среднего давления за сутки
+prev_p_station <- working_dataset$p_station_avg[1:1825]
+prev_p_station <- c(NA, prev_p_station)
+p_station_trend <- working_dataset$p_station_avg - prev_p_station
+working_dataset <- tibble::add_column(working_dataset,
+                                      p_station_trend,
+                                      .after = "p_station_avg")
+
+# (ДОБАВЛЕНО) Добавление столбца с изменением температуры воздуха на уровне 925 гПа
+# за сутки за 00 UTC
+prev_t_925_0 <- working_dataset$t_925_0[1:1825]
+prev_t_925_0 <- c(NA, prev_t_925_0)
+t_925_0_trend <- working_dataset$t_925_0 - prev_t_925_0
+working_dataset <- tibble::add_column(working_dataset,
+                                      t_925_0_trend,
+                                      .after = "t_925_12")
+
+# (ДОБАВЛЕНО) Добавление столбца с изменением температуры воздуха на уровне 925 гПа
+# за сутки за 12 UTC
+prev_t_925_12 <- working_dataset$t_925_12[1:1825]
+prev_t_925_12 <- c(NA, prev_t_925_12)
+t_925_12_trend <- working_dataset$t_925_12 - prev_t_925_12
+working_dataset <- tibble::add_column(working_dataset,
+                                      t_925_12_trend,
+                                      .after = "t_925_0_trend")
+
+# (ДОБАВЛЕНО) Добавление столбца с разностью скорости ветра на уровне станции
+# и АТ-925 за 00 UTC (АТ-925 - земля)
+wind_diff_0 <- working_dataset$v_925_0 - working_dataset$w_speed_0
+working_dataset <- tibble::add_column(working_dataset,
+                                      wind_diff_0,
+                                      .after = "v_925_12")
+
+# (ДОБАВЛЕНО) Добавление столбца с разностью скорости ветра на уровне станции
+# и АТ-925 за 12 UTC (АТ-925 - земля)
+wind_diff_12 <- working_dataset$v_925_12 - working_dataset$w_speed_12
+working_dataset <- tibble::add_column(working_dataset,
+                                      wind_diff_12,
+                                      .after = "wind_diff_0")
+
+# (ДОБАВЛЕНО) Добавление столбца с разностью скорости ветра на уровне станции
+# и АТ-925 за 00 UTC (АТ-925 - земля) за предыдущие сутки
+prev_wind_diff_0 <- working_dataset$wind_diff_0[1:1825]
+prev_wind_diff_0 <- c(NA, prev_wind_diff_0)
+working_dataset <- tibble::add_column(working_dataset,
+                                      prev_wind_diff_0,
+                                      .after = "wind_diff_12")
+
+# (ДОБАВЛЕНО) Добавление столбца с разностью скорости ветра на уровне станции
+# и АТ-925 за 12 UTC (АТ-925 - земля) за предыдущие сутки
+prev_wind_diff_12 <- working_dataset$wind_diff_12[1:1825]
+prev_wind_diff_12 <- c(NA, prev_wind_diff_12)
+working_dataset <- tibble::add_column(working_dataset,
+                                      prev_wind_diff_12,
+                                      .after = "prev_wind_diff_0")
+
+# (ДОБАВЛЕНО) Добавление столбца с разностью температуры на уровне станции
+# и АТ-925 за 00 UTC за предыдущие сутки
+prev_t_diff_0 <- working_dataset$t_diff_0[1:1825]
+prev_t_diff_0 <- c(NA, prev_t_diff_0)
+working_dataset <- tibble::add_column(working_dataset,
+                                      prev_t_diff_0,
+                                      .after = "t_diff_12")
+
+# (ДОБАВЛЕНО) Добавление столбца с разностью температуры на уровне станции
+# и АТ-925 за 00 UTC за предыдущие сутки
+prev_t_diff_12 <- working_dataset$t_diff_12[1:1825]
+prev_t_diff_12 <- c(NA, prev_t_diff_12)
+working_dataset <- tibble::add_column(working_dataset,
+                                      prev_t_diff_12,
+                                      .after = "prev_t_diff_0")
 
 
 #### Сохранение окончательного набора данных ####
