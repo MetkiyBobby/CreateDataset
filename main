@@ -466,7 +466,7 @@ working_dataset <- tibble::add_column(working_dataset,
                                       .after = "t_diff_12")
 
 # (ДОБАВЛЕНО) Добавление столбца с разностью температуры на уровне станции
-# и АТ-925 за 00 UTC за предыдущие сутки
+# и АТ-925 за 12 UTC за предыдущие сутки
 prev_t_diff_12 <- working_dataset$t_diff_12[1:1825]
 prev_t_diff_12 <- c(NA, prev_t_diff_12)
 working_dataset <- tibble::add_column(working_dataset,
