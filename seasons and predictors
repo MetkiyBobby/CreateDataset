@@ -1,4 +1,4 @@
-# сОЗДАНИЕ НАБОРОВ ДАННЫХ ДЛЯ ТЕПЛОГО (МАЙ-СЕНТЯБРЬ) И ХОЛОДНОГО 
+# СОЗДАНИЕ НАБОРОВ ДАННЫХ ДЛЯ ТЕПЛОГО (МАЙ-СЕНТЯБРЬ) И ХОЛОДНОГО 
 # (ОКТЯБРЬ-АПРЕЛЬ) ПЕРИОДОВ
 
 # Импорт набора данных 
@@ -136,13 +136,230 @@ assign(paste("T_avg", "_mean", sep = ""),
        average(season = season, seasonName = "summer", predictor = "T_avg",
                min = 5, max = 20, step = 5))
 
+assign(paste("w_direct_0", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_direct_0",
+               min = 20, max = 340, step = 20))
+
+assign(paste("w_direct_3", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_direct_3",
+               min = 20, max = 340, step = 20))
+
+assign(paste("w_direct_6", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_direct_6",
+               min = 20, max = 340, step = 20))
+
+assign(paste("w_direct_9", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_direct_9",
+               min = 20, max = 340, step = 20))
+
+assign(paste("w_direct_12", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_direct_12",
+               min = 20, max = 340, step = 20))
+
+assign(paste("w_direct_15", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_direct_15",
+               min = 20, max = 340, step = 20))
+
+assign(paste("w_direct_18", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_direct_18",
+               min = 20, max = 340, step = 20))
+
+assign(paste("w_direct_21", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_direct_21",
+               min = 20, max = 340, step = 20))
+
+assign(paste("w_direct_avg", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_direct_avg",
+               min = 20, max = 340, step = 20))
+
+assign(paste("w_speed_0", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_speed_0",
+               min = 1, max = 6, step = 1))
+
+assign(paste("w_speed_3", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_speed_3",
+               min = 1, max = 5, step = 1))
+
+assign(paste("w_speed_6", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_speed_6",
+               min = 1, max = 7, step = 1))
+
+assign(paste("w_speed_9", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_speed_9",
+               min = 1, max = 6, step = 1))
+
+assign(paste("w_speed_12", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_speed_12",
+               min = 1, max = 7, step = 1))
+
+assign(paste("w_speed_15", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_speed_15",
+               min = 1, max = 5, step = 1))
+
+assign(paste("w_speed_18", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_speed_18",
+               min = 1, max = 5, step = 1))
+
+assign(paste("w_speed_21", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_speed_21",
+               min = 1, max = 6, step = 1))
+
+assign(paste("w_speed_avg_night", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_speed_avg_night",
+               min = 1, max = 4, step = 1))
+
+assign(paste("w_speed_avg_day", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_speed_avg_day",
+               min = 1, max = 6, step = 1))
+
+assign(paste("w_speed_avg", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_speed_avg",
+               min = 1, max = 4, step = 1))
+
+assign(paste("w_gust_0", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_gust_0",
+               min = 1, max = 12, step = 1))
+
+assign(paste("w_gust_3", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_gust_3",
+               min = 1, max = 12, step = 1))
+
+assign(paste("w_gust_6", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_gust_6",
+               min = 2, max = 12, step = 1))
+
+assign(paste("w_gust_9", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_gust_9",
+               min = 2, max = 13, step = 1))
+
+assign(paste("w_gust_12", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_gust_12",
+               min = 2, max = 13, step = 1))
+
+assign(paste("w_gust_15", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_gust_15",
+               min = 2, max = 13, step = 1))
+
+assign(paste("w_gust_18", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_gust_18",
+               min = 1, max = 12, step = 1))
+
+assign(paste("w_gust_21", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "w_gust_21",
+               min = 1, max = 10, step = 1))
+
+assign(paste("humidity_0", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "humidity_0",
+               min = 60, max = 90, step = 10))
+
+assign(paste("humidity_3", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "humidity_3",
+               min = 60, max = 90, step = 10))
+
+assign(paste("humidity_6", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "humidity_6",
+               min = 30, max = 90, step = 10))
+
+assign(paste("humidity_9", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "humidity_9",
+               min = 30, max = 90, step = 10))
+
+assign(paste("humidity_12", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "humidity_12",
+               min = 30, max = 90, step = 10))
+
+assign(paste("humidity_15", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "humidity_15",
+               min = 30, max = 90, step = 10))
+
+assign(paste("humidity_18", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "humidity_18",
+               min = 40, max = 90, step = 10))
+
+assign(paste("humidity_21", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "humidity_21",
+               min = 50, max = 90, step = 10))
+
+assign(paste("p_station_0", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "p_station_0",
+               min = 980, max = 1020, step = 5))
+
+assign(paste("p_station_3", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "p_station_3",
+               min = 980, max = 1020, step = 5))
+
+assign(paste("p_station_6", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "p_station_6",
+               min = 980, max = 1020, step = 5))
+
+assign(paste("p_station_9", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "p_station_9",
+               min = 980, max = 1020, step = 5))
+
+assign(paste("p_station_12", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "p_station_12",
+               min = 980, max = 1020, step = 5))
+
+assign(paste("p_station_15", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "p_station_15",
+               min = 980, max = 1020, step = 5))
+
+assign(paste("p_station_18", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "p_station_18",
+               min = 980, max = 1020, step = 5))
+
+assign(paste("p_station_21", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "p_station_21",
+               min = 980, max = 1020, step = 5))
+
+assign(paste("p_station_avg", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "p_station_avg",
+               min = 980, max = 1020, step = 5))
+
+assign(paste("p_station_trend", "_mean", sep = ""),
+       average(season = season, seasonName = "summer", predictor = "p_station_trend",
+               min = -12, max = 12, step = 3))
+
 # Создание объединенной таблицы значений преобразованных предикторов
 predictors <- rbind(t_0_mean, t_3_mean, t_6_mean, t_9_mean, t_12_mean,
                     t_15_mean, t_18_mean, t_21_mean, T_max_mean, T_min_mean,
-                    T_avg_mean)
+                    T_avg_mean,
+                    w_direct_0_mean, w_direct_3_mean, w_direct_6_mean,
+                    w_direct_9_mean, w_direct_12_mean, w_direct_15_mean,
+                    w_direct_18_mean, w_direct_21_mean, w_direct_avg_mean,
+                    w_speed_0_mean, w_speed_3_mean, w_speed_6_mean,
+                    w_speed_9_mean, w_speed_12_mean, w_speed_15_mean,
+                    w_speed_18_mean, w_speed_21_mean, w_speed_avg_day_mean,
+                    w_speed_avg_night_mean, w_speed_avg_mean,
+                    w_gust_0_mean, w_gust_3_mean, w_gust_6_mean,
+                    w_gust_9_mean, w_gust_12_mean, w_gust_15_mean,
+                    w_gust_18_mean, w_gust_21_mean,
+                    humidity_0_mean, humidity_3_mean, humidity_6_mean,
+                    humidity_9_mean, humidity_12_mean, humidity_15_mean,
+                    humidity_18_mean, humidity_21_mean,
+                    p_station_0_mean, p_station_3_mean, p_station_6_mean,
+                    p_station_9_mean, p_station_12_mean, p_station_15_mean,
+                    p_station_18_mean, p_station_21_mean, 
+                    p_station_avg_mean, p_station_trend_mean)
 
 # Удаление лишних переменных
 rm(t_0_mean, t_3_mean, t_6_mean, t_9_mean, t_12_mean,
    t_15_mean, t_18_mean, t_21_mean, T_max_mean, T_min_mean,
-   T_avg_mean)
-
+   T_avg_mean,
+   w_direct_0_mean, w_direct_3_mean, w_direct_6_mean,
+   w_direct_9_mean, w_direct_12_mean, w_direct_15_mean,
+   w_direct_18_mean, w_direct_21_mean, w_direct_avg_mean,
+   w_speed_0_mean, w_speed_3_mean, w_speed_6_mean,
+   w_speed_9_mean, w_speed_12_mean, w_speed_15_mean,
+   w_speed_18_mean, w_speed_21_mean, w_speed_avg_day_mean,
+   w_speed_avg_night_mean, w_speed_avg_mean,
+   w_gust_0_mean, w_gust_3_mean, w_gust_6_mean,
+   w_gust_9_mean, w_gust_12_mean, w_gust_15_mean,
+   w_gust_18_mean, w_gust_21_mean,
+   humidity_0_mean, humidity_3_mean, humidity_6_mean,
+   humidity_9_mean, humidity_12_mean, humidity_15_mean,
+   humidity_18_mean, humidity_21_mean,
+   p_station_0_mean, p_station_3_mean, p_station_6_mean,
+   p_station_9_mean, p_station_12_mean, p_station_15_mean,
+   p_station_18_mean, p_station_21_mean, 
+   p_station_avg_mean, p_station_trend_mean)
