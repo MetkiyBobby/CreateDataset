@@ -408,6 +408,8 @@ assign(paste("h_500_1000_12", "_mean", sep = ""),
        average(season = season, seasonName = "summer", predictor = "h_500_1000_12",
                min = 525, max = 565, step = 5))
 
+## TODO: Add vapor variable!!!!
+
 # Создание объединенной таблицы значений преобразованных предикторов
 predictors_summer <- rbind(t_0_mean, t_3_mean, t_6_mean, t_9_mean, t_12_mean,
                     t_15_mean, t_18_mean, t_21_mean, T_max_mean, T_min_mean,
@@ -633,6 +635,38 @@ assign(paste("w_gust_21", "_mean", sep = ""),
        average(season = season, seasonName = "winter", predictor = "w_gust_21",
                min = 1, max = 13, step = 1))
 
+assign(paste("vapor_0", "_mean", sep = ""),
+       average(season = season, seasonName = "winter", predictor = "vapor_0",
+               min = 1, max = 7, step = 1))
+
+assign(paste("vapor_3", "_mean", sep = ""),
+       average(season = season, seasonName = "winter", predictor = "vapor_3",
+               min = 1, max = 7, step = 1))
+
+assign(paste("vapor_6", "_mean", sep = ""),
+       average(season = season, seasonName = "winter", predictor = "vapor_6",
+               min = 1, max = 7, step = 1))
+
+assign(paste("vapor_9", "_mean", sep = ""),
+       average(season = season, seasonName = "winter", predictor = "vapor_9",
+               min = 1, max = 7, step = 1))
+
+assign(paste("vapor_12", "_mean", sep = ""),
+       average(season = season, seasonName = "winter", predictor = "vapor_12",
+               min = 1, max = 7, step = 1))
+
+assign(paste("vapor_15", "_mean", sep = ""),
+       average(season = season, seasonName = "winter", predictor = "vapor_15",
+               min = 1, max = 7, step = 1))
+
+assign(paste("vapor_18", "_mean", sep = ""),
+       average(season = season, seasonName = "winter", predictor = "vapor_18",
+               min = 1, max = 7, step = 1))
+
+assign(paste("vapor_21", "_mean", sep = ""),
+       average(season = season, seasonName = "winter", predictor = "vapor_21",
+               min = 1, max = 7, step = 1))
+
 assign(paste("humidity_0", "_mean", sep = ""),
        average(season = season, seasonName = "winter", predictor = "humidity_0",
                min = 50, max = 90, step = 10))
@@ -746,52 +780,52 @@ assign(paste("prev_t_diff_12", "_mean", sep = ""),
                min = -8, max = 6, step = 2))
 
 assign(paste("d_925_0", "_mean", sep = ""),
-       average(season = season, seasonName = "summer", predictor = "d_925_0",
+       average(season = season, seasonName = "winter", predictor = "d_925_0",
                min = 20, max = 340, step = 20))
 
 assign(paste("d_925_12", "_mean", sep = ""),
-       average(season = season, seasonName = "summer", predictor = "d_925_12",
+       average(season = season, seasonName = "winter", predictor = "d_925_12",
                min = 20, max = 340, step = 20))
 
 assign(paste("d_925_avg", "_mean", sep = ""),
-       average(season = season, seasonName = "summer", predictor = "d_925_avg",
+       average(season = season, seasonName = "winter", predictor = "d_925_avg",
                min = 20, max = 340, step = 20))
 
 assign(paste("v_925_0", "_mean", sep = ""),
-       average(season = season, seasonName = "summer", predictor = "v_925_0",
-               min = 2, max = 19, step = 1))
+       average(season = season, seasonName = "winter", predictor = "v_925_0",
+               min = 2, max = 20, step = 1))
 
 assign(paste("v_925_12", "_mean", sep = ""),
-       average(season = season, seasonName = "summer", predictor = "v_925_12",
-               min = 2, max = 16, step = 1))
+       average(season = season, seasonName = "winter", predictor = "v_925_12",
+               min = 2, max = 21, step = 1))
 
 assign(paste("v_925_avg", "_mean", sep = ""),
-       average(season = season, seasonName = "summer", predictor = "v_925_avg",
-               min = 3, max = 16, step = 1))
+       average(season = season, seasonName = "winter", predictor = "v_925_avg",
+               min = 3, max = 21, step = 1))
 
 assign(paste("wind_diff_0", "_mean", sep = ""),
-       average(season = season, seasonName = "summer", predictor = "wind_diff_0",
-               min = 1, max = 16, step = 1))
+       average(season = season, seasonName = "winter", predictor = "wind_diff_0",
+               min = 1, max = 17, step = 1))
 
 assign(paste("wind_diff_12", "_mean", sep = ""),
-       average(season = season, seasonName = "summer", predictor = "wind_diff_12",
-               min = 0, max = 14, step = 1))
+       average(season = season, seasonName = "winter", predictor = "wind_diff_12",
+               min = 0, max = 16, step = 1))
 
 assign(paste("prev_wind_diff_0", "_mean", sep = ""),
-       average(season = season, seasonName = "summer", predictor = "prev_wind_diff_0",
-               min = 1, max = 16, step = 1))
+       average(season = season, seasonName = "winter", predictor = "prev_wind_diff_0",
+               min = 1, max = 17, step = 1))
 
 assign(paste("prev_wind_diff_12", "_mean", sep = ""),
-       average(season = season, seasonName = "summer", predictor = "prev_wind_diff_12",
-               min = 0, max = 14, step = 1))
+       average(season = season, seasonName = "winter", predictor = "prev_wind_diff_12",
+               min = 0, max = 16, step = 1))
 
 assign(paste("h_500_1000_00", "_mean", sep = ""),
-       average(season = season, seasonName = "summer", predictor = "h_500_1000_00",
-               min = 520, max = 565, step = 5))
+       average(season = season, seasonName = "winter", predictor = "h_500_1000_00",
+               min = 500, max = 540, step = 5))
 
 assign(paste("h_500_1000_12", "_mean", sep = ""),
-       average(season = season, seasonName = "summer", predictor = "h_500_1000_12",
-               min = 525, max = 565, step = 5))
+       average(season = season, seasonName = "winter", predictor = "h_500_1000_12",
+               min = 500, max = 540, step = 5))
 
 # Создание объединенной таблицы значений преобразованных предикторов
 predictors_winter <- rbind(t_0_mean, t_3_mean, t_6_mean, t_9_mean, t_12_mean,
@@ -807,6 +841,9 @@ predictors_winter <- rbind(t_0_mean, t_3_mean, t_6_mean, t_9_mean, t_12_mean,
                     w_gust_0_mean, w_gust_3_mean, w_gust_6_mean,
                     w_gust_9_mean, w_gust_12_mean, w_gust_15_mean,
                     w_gust_18_mean, w_gust_21_mean,
+                    vapor_0_mean, vapor_3_mean, vapor_6_mean,
+                    vapor_9_mean, vapor_12_mean, vapor_15_mean,
+                    vapor_18_mean, vapor_21_mean,
                     humidity_0_mean, humidity_3_mean, humidity_6_mean,
                     humidity_9_mean, humidity_12_mean, humidity_15_mean,
                     humidity_18_mean, humidity_21_mean,
@@ -840,6 +877,9 @@ rm(t_0_mean, t_3_mean, t_6_mean, t_9_mean, t_12_mean,
    w_gust_0_mean, w_gust_3_mean, w_gust_6_mean,
    w_gust_9_mean, w_gust_12_mean, w_gust_15_mean,
    w_gust_18_mean, w_gust_21_mean,
+   vapor_0_mean, vapor_3_mean, vapor_6_mean,
+   vapor_9_mean, vapor_12_mean, vapor_15_mean,
+   vapor_18_mean, vapor_21_mean,
    humidity_0_mean, humidity_3_mean, humidity_6_mean,
    humidity_9_mean, humidity_12_mean, humidity_15_mean,
    humidity_18_mean, humidity_21_mean,
@@ -858,11 +898,44 @@ rm(t_0_mean, t_3_mean, t_6_mean, t_9_mean, t_12_mean,
    prev_wind_diff_0_mean, prev_wind_diff_12_mean, 
    h_500_1000_00_mean, h_500_1000_12_mean)
 
-#### Сохранение файла с преобразованными предикторами ####
+predictors <- rbind(predictors_summer, predictors_winter)
+
+#### Сохранение файла с таблицей значений для преобразования предикторов ####
 file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
                    "/Разработка прогностической схемы (Вологда)",
                    "/Datasets/transformed_predictors.csv",
                    sep = "")
 readr::write_csv(predictors, file_path)
 
+#### Преобразование предикторов ####
+# Зимний период
+transformed_predictors_list <- names(winter_dataset)[c(5:15, 33:59, 62:110)]
+winter_trans <- winter_dataset[, 3, drop = FALSE]
 
+for (i in names(winter_dataset)) {
+  if (any(transformed_predictors_list == i)) {
+    x <- paste0(i, "_trans")
+    winter_trans$x <- transformed_meteo(winter_dataset, seasonName = "winter", predictor = i)
+    colnames(winter_trans)[length(winter_trans)] <- x
+  }
+}
+
+# Летний период
+transformed_predictors_list <- names(summer_dataset)[c(5:15, 33:59, 62:110)]
+summer_trans <- summer_dataset[, 3, drop = FALSE]
+
+for (i in names(summer_dataset)) {
+  if (any(transformed_predictors_list == i)) {
+    x <- paste0(i, "_trans")
+    summer_trans$x <- transformed_meteo(summer_dataset, seasonName = "summer", predictor = i)
+    colnames(summer_trans)[length(summer_trans)] <- x
+  }
+}
+
+#### Сохранение файлов с параметром Р####
+file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
+                   "/Разработка прогностической схемы (Вологда)",
+                   "/Datasets/P_cold_period.csv",
+                   sep = "")
+x <- winter_dataset_NA[ , c("dates", "P", "P_prev")]
+readr::write_csv(x, file_path)
