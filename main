@@ -83,10 +83,10 @@ meteo <- read.table(file_path, header = TRUE, sep = ",", stringsAsFactors = FALS
 # Создание вектора содержащего неповторяющиеся даты
 unique_dates <- as.Date(unique(meteo$date))
 
-# Вычсиление максимальной температуры для каждой неповторяющейся даты
+# Вычисиление максимальной температуры для каждой неповторяющейся даты
 T_max_new <- aggregate(T_max ~ date, data = meteo, max)[2]
 
-# Вычсиление минимальной температуры для каждой неповторяющейся даты
+# Вычисиление минимальной температуры для каждой неповторяющейся даты
 T_min_new <- aggregate(T_min ~ date, data = meteo, min)[2]
 
 #### СОЗДАНИЕ ВЕКТОРОВ С МЕТЕОВЕЛИЧИНАМИ ПО СРОКАМ ####
@@ -385,22 +385,6 @@ working_dataset <- tibble::add_column(working_dataset,
                                       w_direct_avg,
                                       .after = "w_direct_21")
 
-# (ДОБАВЛЕНО) Добавление столбца с разностью температуры на уровне станции и АТ-925
-# за 00 UTC
-t_diff_0 <- working_dataset$t_0 - working_dataset$t_925_0
-t_diff_0 <- round(t_diff_0, digits = 1)
-working_dataset <- tibble::add_column(working_dataset,
-                                      t_diff_0,
-                                      .after = "h_500_1000_12")
-
-# (ДОБАВЛЕНО) Добавление столбца с разностью температуры на уровне станции и АТ-925
-# за 12 UTC
-t_diff_12 <- working_dataset$t_12 - working_dataset$t_925_12
-hit_diff_12 <- round(t_diff_12, digits = 1)
-working_dataset <- tibble::add_column(working_dataset,
-                                      t_diff_12,
-                                      .after = "t_diff_0")
-
 # (ДОБАВЛЕНО) Добавление столбца с изменением среднего давления за сутки
 prev_p_station <- working_dataset$p_station_avg[1:1825]
 prev_p_station <- c(NA, prev_p_station)
@@ -427,12 +411,28 @@ working_dataset <- tibble::add_column(working_dataset,
                                       t_925_12_trend,
                                       .after = "t_925_0_trend")
 
+# (ДОБАВЛЕНО) Добавление столбца с разностью температуры на уровне станции и АТ-925
+# за 00 UTC
+t_diff_0 <- working_dataset$t_0 - working_dataset$t_925_0
+t_diff_0 <- round(t_diff_0, digits = 1)
+working_dataset <- tibble::add_column(working_dataset,
+                                      t_diff_0,
+                                      .after = "t_925_12_trend")
+
+# (ДОБАВЛЕНО) Добавление столбца с разностью температуры на уровне станции и АТ-925
+# за 12 UTC
+t_diff_12 <- working_dataset$t_12 - working_dataset$t_925_12
+hit_diff_12 <- round(t_diff_12, digits = 1)
+working_dataset <- tibble::add_column(working_dataset,
+                                      t_diff_12,
+                                      .after = "t_diff_0")
+
 # (ДОБАВЛЕНО) Добавление столбца с разностью скорости ветра на уровне станции
 # и АТ-925 за 00 UTC (АТ-925 - земля)
 wind_diff_0 <- working_dataset$v_925_0 - working_dataset$w_speed_0
 working_dataset <- tibble::add_column(working_dataset,
                                       wind_diff_0,
-                                      .after = "v_925_12")
+                                      .after = "v_925_avg")
 
 # (ДОБАВЛЕНО) Добавление столбца с разностью скорости ветра на уровне станции
 # и АТ-925 за 12 UTC (АТ-925 - земля)
@@ -472,7 +472,6 @@ prev_t_diff_12 <- c(NA, prev_t_diff_12)
 working_dataset <- tibble::add_column(working_dataset,
                                       prev_t_diff_12,
                                       .after = "prev_t_diff_0")
-
 
 #### Сохранение окончательного набора данных ####
 file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
