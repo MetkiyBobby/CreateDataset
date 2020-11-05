@@ -1,352 +1,195 @@
-# СОЗДАНИЕ НАБОРА ДАННЫХ ДЛЯ РАЗРАБОТКИ ПРОГНОСТИЧЕСКОЙ СХЕМЫ
-# НАБОР СОДЕРЖИТ ДАННЫЕ ЗА ПЕРИОД С 01.01.2014 по 31.12.2018
-
-# Набор данных содержит данные приземных наблюдений:
-# - Температура в срок наблюдения 
-# - Максимальная, минимальная и средняя температура за сутки
-# - Дальность видимости в срок наблюдения
-# - Явления (в цифрах кода) в срок наблюдения
-# - Направление ветра в срок наблюдения
-# - Средняя скорость ветра в срок наблюдения
-# - Средняя скорость ветра за ночь (18-03 UTC) и за день (06-15 UTC)
-# - Порывы ветра в срок наблюдения
-# - Сумма осадков за 12 часов (измерение в 03 и в 15 UTC)
-# - Относительная влажность воздуха в срок наблюдения
-# - Атмосферное давление на уровне станции в срок наблюдения
-
-# Набор данных содержит данные аэрологических наблюдений: 
-# - Высота поверхности AT925 за 00 и 12 UTC
-# - Температура на поверхности AT925 за 00 и 12 UTC
-# - Направление ветра на поверхности AT925 за 00 и 12 UTC
-# - Скорость ветра поверхности AT925 за 00 и 12 UTC
-# - Относительный геопотенциал между АТ1000 и АТ500 за 00 и 12 UTC
-
-# Наибор данных содержит ежедневные значения параметра Р
+# CREATING A DATA SET FOR DEVELOPING A FORECASTING METHOD
+# For a description of variables, see variables.doc
 
 library(tibble)
 library(readr)
+library(dplyr)
 
-#### СОЗДАНИЕ НАБОРА МЕТЕОРОЛОГИЧЕСКИХ ДАННЫХ ####
+# Setting the working directory to the location of the script file
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
-# Импорт исходных данных приземных метеорологический наблюдений 
-file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
-                  "/Разработка прогностической схемы (Вологда)",
-                  "/Datasets/27037.txt", sep = "")
-meteo <- read.table(file_path, header = FALSE, sep = ";")
+#### CREATING A METEOROLOGICAL DATA SET ####
 
-# Удаление значений до указанного года
-year <- 2014
-meteo <- meteo[meteo$V6 >= year,]
+# Import source data for ground-level meteorological observations 
+meteo <- read.table("27037.txt", header = FALSE, sep = ";")
 
-# Удаление лишних переменных
-variables_to_delete <- c(2:5, 10, 12, 13, 15:37, 39, 
-                         41, 43:44, 46:47, 50:59,
-                         61:66, 68, 70:72, 74:75, 77:82,
-                         84, 86:90) 
-meteo <- meteo[-variables_to_delete]  
+# Deleting values before the specified year
+meteo <- meteo[meteo$V6 >= 2014,]
 
-# Переименование переменных
-meteo_variables <- c("WMO Index", "Year", "Month", "Day", "Hour", "Time", # Имена переменных
-                     "Visibility", "Weather", "Wind_direction", "Wind_speed",
-                     "Wind_gust", "Precipitation", "Precipitation_tag",
-                     "Temperature", "T_min", "T_max", "Vapor", "Humidity",
-                     "P_station", "P_sea") 
-names(meteo) <- meteo_variables 
+# Removal of unnecessary variables
+meteo <- meteo[-c(2:5, 10, 12, 13, 15:37, 39, 
+                  41, 43:44, 46:47, 50:59,
+                  61:66, 68, 70:72, 74:75, 77:82,
+                  84, 86:90) ]  
 
-# Раскодирование значений горизонтальной видимости, км
+# Renaming variables
+names(meteo) <- c("WMO Index", "Year", "Month", "Day", "Hour", "Time", 
+                  "Visibility", "Weather", "Wind_direction", "Wind_speed",
+                  "Wind_gust", "Precipitation", "Precipitation_tag",
+                  "Temperature", "T_min", "T_max", "Vapor", "Humidity",
+                  "P_station", "P_sea") 
+
+# Decoding the values of horizontal visibility, km
 visibility_values <- c(0.05, 0.2, 0.5, 1, 2, 4, 10, 20)
-meteo$Visibility[meteo$Visibility == 91] <- visibility_values[1]
-meteo$Visibility[meteo$Visibility == 92] <- visibility_values[2]
-meteo$Visibility[meteo$Visibility == 93] <- visibility_values[3]
-meteo$Visibility[meteo$Visibility == 94] <- visibility_values[4]
-meteo$Visibility[meteo$Visibility == 95] <- visibility_values[5]
-meteo$Visibility[meteo$Visibility == 96] <- visibility_values[6]
-meteo$Visibility[meteo$Visibility == 97] <- visibility_values[7]
-meteo$Visibility[meteo$Visibility == 98] <- visibility_values[8]
 
-# Добавление столбца с датами
-date <- as.Date(paste(meteo$Year, meteo$Month, meteo$Day, sep = "/"))
-meteo <- tibble::add_column(meteo, date, .after = "WMO Index")
+# Finding a match between the encoded index value and the visibility value
+meteo$Visibility <- sapply(meteo$Visibility, function(x) {
+  visibility_values[which(sort(unique(meteo$Visibility)) == x)]
+  })
 
-# Сохранение промежуточного варианта в файл CSV
-file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
-                   "/Разработка прогностической схемы (Вологда)/Datasets/meteo.csv",
-                   sep = "")
-readr::write_csv(meteo, file_path)
+# Adding a date column
+meteo <- tibble::add_column(meteo, 
+                            date = as.Date(paste(meteo$Year, meteo$Month, meteo$Day,
+                                                 sep = "/")),
+                            .after = "WMO Index")
 
-# Импорт промежуточного варианта
-file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
-                   "/Разработка прогностической схемы (Вологда)/Datasets/meteo.csv",
-                   sep = "")
-meteo <- read.table(file_path, header = TRUE, sep = ",", stringsAsFactors = FALSE)
+# Saving the intermediate result to a CSV file
+readr::write_csv(meteo, paste0(getwd(), "/meteo.csv"))
 
-# Создание вектора содержащего неповторяющиеся даты
-unique_dates <- as.Date(unique(meteo$date))
+# Import an intermediate file
+meteo <- read.table(paste0(getwd(), "/meteo.csv"),
+                    header = TRUE, sep = ",", stringsAsFactors = FALSE)
 
-# Вычисиление максимальной температуры для каждой неповторяющейся даты
-T_max_new <- aggregate(T_max ~ date, data = meteo, max)[2]
+#### Creating a new date frame with data for each day ####
+meteo2 <- data.frame(dates = as.Date(unique(meteo$date)),
+                     T_max = aggregate(T_max ~ date, data = meteo, max)[2],
+                     T_min = aggregate(T_min ~ date, data = meteo, min)[2])
 
-# Вычисиление минимальной температуры для каждой неповторяющейся даты
-T_min_new <- aggregate(T_min ~ date, data = meteo, min)[2]
+# Function for creating a table where variables are weather values for 
+# each observation term
+obs_by_hour <- function(variables) {
+  variable_by_hour <- function(variable){
+    # Creating a matrix with weather value for each term from 0 to 21
+    sapply(seq(0, 21, 3), function(x) meteo[meteo$Hour == x, variable])}
+  # Creating a matrix with all weather values
+  matrix(sapply(variables, variable_by_hour),
+           ncol = length(variables) * 8)
+}
 
-#### СОЗДАНИЕ ВЕКТОРОВ С МЕТЕОВЕЛИЧИНАМИ ПО СРОКАМ ####
+# Adding variables with weather observation data by terms
+meteo2 <- cbind(meteo2,
+                obs_by_hour(names(meteo)[c(8, 10:12, 15, 18:21)]))
 
-# Создание векторов с видимостью по срокам (ВСВ)
-vis_0 <- meteo[meteo$Hour == 0, "Visibility"] 
-vis_3 <- meteo[meteo$Hour == 3, "Visibility"] 
-vis_6 <- meteo[meteo$Hour == 6, "Visibility"]
-vis_9 <- meteo[meteo$Hour == 9, "Visibility"] 
-vis_12 <- meteo[meteo$Hour == 12, "Visibility"]
-vis_15 <- meteo[meteo$Hour == 15, "Visibility"]
-vis_18 <- meteo[meteo$Hour == 18, "Visibility"]
-vis_21 <- meteo[meteo$Hour == 21, "Visibility"]
+# Naming new variables
+names(meteo2)[4:length(names(meteo2))] <- t(outer(names(meteo)[c(8, 10:12, 15, 18:21)],
+                                                  seq(0, 21, 3), paste0))
 
-# Создание векторов с явлениями по срокам (ВСВ)
-w_0 <- meteo[meteo$Hour == 0, "Weather"] 
-w_3 <- meteo[meteo$Hour == 3, "Weather"] 
-w_6 <- meteo[meteo$Hour == 6, "Weather"]
-w_9 <- meteo[meteo$Hour == 9, "Weather"] 
-w_12 <- meteo[meteo$Hour == 12, "Weather"]
-w_15 <- meteo[meteo$Hour == 15, "Weather"]
-w_18 <- meteo[meteo$Hour == 18, "Weather"]
-w_21 <- meteo[meteo$Hour == 21, "Weather"]
+# Adding variables with the amount of precipitation by term
+meteo2 <- tibble::add_column(meteo2, 
+                            precipitation_3 = meteo[meteo$Hour == 3, "Precipitation"],
+                            .after = "Wind_gust21")
+meteo2 <- tibble::add_column(meteo2, 
+                             precipitation_15 = meteo[meteo$Hour == 15, "Precipitation"],
+                             .after = "precipitation_3")
 
-# Создание векторов с направлением ветра по срокам (ВСВ) 
-w_direct_0 <- meteo[meteo$Hour == 0, "Wind_direction"] 
-w_direct_3 <- meteo[meteo$Hour == 3, "Wind_direction"] 
-w_direct_6 <- meteo[meteo$Hour == 6, "Wind_direction"]
-w_direct_9 <- meteo[meteo$Hour == 9, "Wind_direction"] 
-w_direct_12 <- meteo[meteo$Hour == 12, "Wind_direction"]
-w_direct_15 <- meteo[meteo$Hour == 15, "Wind_direction"]
-w_direct_18 <- meteo[meteo$Hour == 18, "Wind_direction"]
-w_direct_21 <- meteo[meteo$Hour == 21, "Wind_direction"]
+# Saving a set of meteorological data to a CSV file
+readr::write_csv(meteo2, paste0(getwd(), "/meteo_2.csv"))
 
-# Создание векторов со скоростью ветра по срокам (ВСВ)
-w_speed_0 <- meteo[meteo$Hour == 0, "Wind_speed"] 
-w_speed_3 <- meteo[meteo$Hour == 3, "Wind_speed"] 
-w_speed_6 <- meteo[meteo$Hour == 6, "Wind_speed"]
-w_speed_9 <- meteo[meteo$Hour == 9, "Wind_speed"] 
-w_speed_12 <- meteo[meteo$Hour == 12, "Wind_speed"]
-w_speed_15 <- meteo[meteo$Hour == 15, "Wind_speed"]
-w_speed_18 <- meteo[meteo$Hour == 18, "Wind_speed"]
-w_speed_21 <- meteo[meteo$Hour == 21, "Wind_speed"]
+#### CREATING A SET OF AEROLOGICAL DATA ####
 
-# Создание векторов с порывами ветра по срокам (ВСВ)
-w_gust_0 <- meteo[meteo$Hour == 0, "Wind_gust"] 
-w_gust_3 <- meteo[meteo$Hour == 3, "Wind_gust"] 
-w_gust_6 <- meteo[meteo$Hour == 6, "Wind_gust"]
-w_gust_9 <- meteo[meteo$Hour == 9, "Wind_gust"] 
-w_gust_12 <- meteo[meteo$Hour == 12, "Wind_gust"]
-w_gust_15 <- meteo[meteo$Hour == 15, "Wind_gust"]
-w_gust_18 <- meteo[meteo$Hour == 18, "Wind_gust"]
-w_gust_21 <- meteo[meteo$Hour == 21, "Wind_gust"]
+# Import of source data for aerological observations observations
+aero <- read.table("aero.csv", header = TRUE, sep = ",")
+aero <- aero[-(1:2),]
 
-# Создание векторов с кол-вом осадков по срокам (ВСВ)
-precipitation_3 <- meteo[meteo$Hour == 3, "Precipitation"]
-precipitation_15 <- meteo[meteo$Hour == 15, "Precipitation"]
-
-# Создание векторов с температурами по срокам (ВСВ)
-t_0 <- meteo[meteo$Hour == 0, "Temperature"] 
-t_3 <- meteo[meteo$Hour == 3, "Temperature"] 
-t_6 <- meteo[meteo$Hour == 6, "Temperature"]
-t_9 <- meteo[meteo$Hour == 9, "Temperature"] 
-t_12 <- meteo[meteo$Hour == 12, "Temperature"]
-t_15 <- meteo[meteo$Hour == 15, "Temperature"]
-t_18 <- meteo[meteo$Hour == 18, "Temperature"]
-t_21 <- meteo[meteo$Hour == 21, "Temperature"] 
-
-# Создание векторов с парциальным давлением водяного пара (ВСВ)
-vapor_0 <- meteo[meteo$Hour == 0, "Vapor"] 
-vapor_3 <- meteo[meteo$Hour == 3, "Vapor"] 
-vapor_6 <- meteo[meteo$Hour == 6, "Vapor"]
-vapor_9 <- meteo[meteo$Hour == 9, "Vapor"] 
-vapor_12 <- meteo[meteo$Hour == 12, "Vapor"]
-vapor_15 <- meteo[meteo$Hour == 15, "Vapor"]
-vapor_18 <- meteo[meteo$Hour == 18, "Vapor"]
-vapor_21 <- meteo[meteo$Hour == 21, "Vapor"] 
-
-# Создание векторов с относительной влажностью по срокам (ВСВ)
-humidity_0 <- meteo[meteo$Hour == 0, "Humidity"] 
-humidity_3 <- meteo[meteo$Hour == 3, "Humidity"] 
-humidity_6 <- meteo[meteo$Hour == 6, "Humidity"]
-humidity_9 <- meteo[meteo$Hour == 9, "Humidity"] 
-humidity_12 <- meteo[meteo$Hour == 12, "Humidity"]
-humidity_15 <- meteo[meteo$Hour == 15, "Humidity"]
-humidity_18 <- meteo[meteo$Hour == 18, "Humidity"]
-humidity_21 <- meteo[meteo$Hour == 21, "Humidity"] 
-
-# Создание векторов с давлением на уровене станции по срокам (ВСВ)
-p_station_0 <- meteo[meteo$Hour == 0, "P_station"] 
-p_station_3 <- meteo[meteo$Hour == 3, "P_station"] 
-p_station_6 <- meteo[meteo$Hour == 6, "P_station"]
-p_station_9 <- meteo[meteo$Hour == 9, "P_station"] 
-p_station_12 <- meteo[meteo$Hour == 12, "P_station"]
-p_station_15 <- meteo[meteo$Hour == 15, "P_station"]
-p_station_18 <- meteo[meteo$Hour == 18, "P_station"]
-p_station_21 <- meteo[meteo$Hour == 21, "P_station"] 
-
-#### Создание таблицы данных с новыми переменными ####
-meteo_2 <- data.frame(dates = unique_dates, 
-                      t_0, t_3, t_6, t_9, t_12, t_15, t_18, t_21,
-                      t_max = T_max_new, t_min = T_min_new,
-                      vis_0, vis_3, vis_6, vis_9, vis_12, vis_15, vis_18, vis_21,
-                      w_0, w_3, w_6, w_9, w_12, w_15, w_18, w_21,
-                      w_direct_0, w_direct_3, w_direct_6, w_direct_9,
-                      w_direct_12, w_direct_15, w_direct_18, w_direct_21,
-                      w_speed_0, w_speed_3, w_speed_6, w_speed_9,
-                      w_speed_12, w_speed_15, w_speed_18, w_speed_21,
-                      w_gust_0, w_gust_3, w_gust_6, w_gust_9,
-                      w_gust_12, w_gust_15, w_gust_18, w_gust_21,
-                      precipitation_3, precipitation_15,
-                      vapor_0, vapor_3, vapor_6, vapor_9, vapor_12,
-                      vapor_15, vapor_18, vapor_21,
-                      humidity_0, humidity_3, humidity_6, humidity_9,
-                      humidity_12, humidity_15, humidity_18, humidity_21,
-                      p_station_0, p_station_3, p_station_6, p_station_9,
-                      p_station_12, p_station_15, p_station_18, p_station_21) 
-
-# Сохранение набора метеорологических данных в файл CSV
-file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
-                   "/Разработка прогностической схемы (Вологда)/Datasets/meteo_2.csv",
-                   sep = "")
-readr::write_csv(meteo_2, file_path)
-
-
-#### СОЗДАНИЕ НАБОРА АЭРОЛОГИЧЕСКИХ ДАННЫХ ####
-
-# Импорт исходных данных аэрологических наблюдений наблюдений 
-file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
-                   "/Разработка прогностической схемы (Вологда)",
-                   "/Datasets/aero.csv", sep = "")
-aero <- read.table(file_path, 
-                   header = TRUE, sep = ",", stringsAsFactors = FALSE)
-
-# Удаление пустых строк
-aero <- aero[3:1828,]
-
-# Преобразование формата даты
+# Converting the date format
 aero$dates <- as.Date(aero$dates, format = "%d-%m-%Y")
 
-# Переименование переменных
-names(aero)[10] <- "h_500_1000_00"
-names(aero)[11] <- "h_500_1000_12"
+# Renaming variables
+aero <- rename(aero, h_500_1000_00 = Рќ_500_1000_00, h_500_1000_12 = Рќ_500_1000_12)
 
-# Преобразование текстовых переменных в целочисленные
-aero$d_925_12 <- as.integer(aero$d_925_12)
-aero$v_925_12 <- as.integer(aero$v_925_12)
-aero$h_500_1000_12 <- as.integer(aero$h_500_1000_12)
+# Converting text variables to numeric variables
+aero[,-1] <- sapply(aero[,-1], as.numeric)
 
-# Сохранение набора аэрологических данных в файл CSV
-file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
-                   "/Разработка прогностической схемы (Вологда)/Datasets/aero_2.csv",
-                   sep = "")
-readr::write_csv(aero, file_path)
+# Saving a set of aerological data to a CSV file
+readr::write_csv(aero, paste0(getwd(), "/aero_2.csv"))
 
+#### THE CREATION OF THE COMBINED DATASET ####
+# Adding daily values for the P parameter
 
-#### СОЗДАНИЕ ОБЪЕДИНЕННОГО НАБОРА ДАННЫХ ####
-# С ДОБАВЛЕНИЕМ ЕЖЕДНЕВНЫХ ЗНАЧЕНИЙ ПАРАМЕТРА Р
+# The import values of the parameter P
+parametr_P <- read.table("P.csv", header = FALSE, sep = ",")
 
-# Импорт исходных данных аэрологических наблюдений наблюдений 
-file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
-                   "/Разработка прогностической схемы (Вологда)",
-                   "/Datasets/P.csv", sep = "")
-parametr_P <- read.table(file_path, 
-                   header = FALSE, sep = ",", stringsAsFactors = FALSE)
+# Renaming variables
+parametr_P <- rename(parametr_P, dates = V1, P = V2)
 
-# Преобразование формата даты
-parametr_P$V1 <- as.Date(parametr_P$V1, format = "%d.%m.%Y")
+# Converting the date format
+parametr_P$dates <- as.Date(parametr_P$dates, format = "%d.%m.%Y")
 
-# Переименование переменных
-names(parametr_P)[1] <- "dates "
-names(parametr_P)[2] <- "P"
+# Association meteorological data and aerological observations
+combined <- merge(meteo2, aero)
 
-# Объединение данных метеорологических и аэрологических наблюдений
-working_dataset <- merge(meteo_2, aero)
-
-# Добавление переменной с параметром Р
-working_dataset <- tibble::add_column(working_dataset,
+# Adding a variable with the P parameter
+combined <- tibble::add_column(combined,
                               P = parametr_P$P, .after = "dates" )
 
-# Создание вектора со значениями параметра Р в предыдущий день
-prev_P <- working_dataset$P[1:1825]
-prev_P <- c(NA, prev_P)
+# Adding a variable with the P parameter for the previous day
+combined <- tibble::add_column(combined1, P_prev = c(NA, combined$P[1:1825]),
+                                .after = "P" )
 
-# Добавление переменной с параметром Р в предыдущий день
-working_dataset <- tibble::add_column(working_dataset, P_prev = prev_P, .after = "P" )
-
-# Сохранение объединенного набора данных
-file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
-                   "/Разработка прогностической схемы (Вологда)",
-                   "/Datasets/working_dataset.csv",
-                   sep = "")
-readr::write_csv(working_dataset, file_path)
-
+# Saving a combined dataset
+readr::write_csv(combined, paste0(getwd(), "/combined.csv"))
 
 #### ДОБАВЛЕНИЕ ПЕРЕМЕННЫХ ОТСУТСТВУЮЩИХ В ПЕРВОНАЧАЛЬНОМ НАБОРЕ ####
 
-# Импорт набора данных 
-file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
-                   "/Разработка прогностической схемы (Вологда)",
-                   "/Datasets/working_dataset.csv", sep = "")
-working_dataset <- read.table(file_path, header = TRUE, sep = ",",
-                              stringsAsFactors = FALSE)
+# Import dataset
+combined <- read.table("combined.csv", header = TRUE, sep = ",")
 
-working_dataset$dates <- as.Date(working_dataset$dates)
+combined$dates <- as.Date(combined$dates)
 
 # (ДОБАВЛЕНО) Добавление столбца с признаком выходных дней (0 - рабочий, 1 - выходной день) 
-weekends <- format(working_dataset$dates, format="%a")
+weekends <- format(combined$dates, format="%a")
 weekends[weekends != "Сб" & weekends != "Вс"] <- 0
 weekends[weekends == "Сб" | weekends == "Вс"] <- 1
 weekends <- as.factor(weekends)
-working_dataset <- tibble::add_column(working_dataset,
+combined <- tibble::add_column(combined,
                                       weekends, .after = "dates")
 
 # (ДОБАВЛЕНО) Добавление столбца со средней суточной температурой
-T_avg <- apply(working_dataset[,5:12], 1, mean)
+T_avg <- apply(combined[,5:12], 1, mean)
 T_avg <- round(T_avg, digits = 1)
-working_dataset <- tibble::add_column(working_dataset,
+combined <- tibble::add_column(combined,
                                       T_avg, .after = "T_min")
 
 # (ДОБАВЛЕНО) Добавление столбца со средней скоростью ветра ночью
-w_speed_avg_night <- apply(working_dataset[,c(40, 41, 46, 47)],
+w_speed_avg_night <- apply(combined[,c(40, 41, 46, 47)],
                            1, mean)
 w_speed_avg_night <- round(w_speed_avg_night, digits = 1)
-working_dataset <- tibble::add_column(working_dataset,
+combined <- tibble::add_column(combined,
                                       w_speed_avg_night,
                                       .after = "w_speed_21")
 
 # (ДОБАВЛЕНО) Добавление столбца со средней скоростью ветра днем
-w_speed_avg_day <- apply(working_dataset[,c(42:45)], 1, mean)
+w_speed_avg_day <- apply(combined[,c(42:45)], 1, mean)
 w_speed_avg_day <- round(w_speed_avg_day, digits = 1)
-working_dataset <- tibble::add_column(working_dataset,
+combined <- tibble::add_column(combined,
                                       w_speed_avg_day,
                                       .after = "w_speed_avg_night")
 
 # (ДОБАВЛЕНО) Добавление столбца со средней суточной скоростью ветра
-w_speed_avg <- apply(working_dataset[,c(40:47)], 1, mean)
+w_speed_avg <- apply(combined[,c(40:47)], 1, mean)
 w_speed_avg <- round(w_speed_avg, digits = 1)
-working_dataset <- tibble::add_column(working_dataset,
+combined <- tibble::add_column(combined,
                                       w_speed_avg,
                                       .after = "w_speed_avg_day")
 
 # (ДОБАВЛЕНО) Добавление столбца со средней суточной влажностью воздуха
-humidity_avg <- apply(working_dataset[,c(69:76)], 1, mean)
+humidity_avg <- apply(combined[,c(69:76)], 1, mean)
 humidity_avg <- round(humidity_avg, digits = 1)
-working_dataset <- tibble::add_column(working_dataset,
+combined <- tibble::add_column(combined,
                                       humidity_avg,
                                       .after = "humidity_21")
 
 # (ДОБАВЛЕНО) Добавление столбца со средним суточным атмосферным давлением на уровне станции
-p_station_avg <- apply(working_dataset[,c(78:85)], 1, mean)
+p_station_avg <- apply(combined[,c(78:85)], 1, mean)
 p_station_avg <- round(p_station_avg, digits = 1)
-working_dataset <- tibble::add_column(working_dataset,
+combined <- tibble::add_column(combined,
                                       p_station_avg,
                                       .after = "p_station_21")
 
 # (ДОБАВЛЕНО) Добавление столбца со средней суточной скоростью ветра на уровне 925 мб
-v_925_avg <- apply(working_dataset[,c(93:94)], 1, mean)
+v_925_avg <- apply(combined[,c(93:94)], 1, mean)
 v_925_avg <- round(v_925_avg, digits = 1)
-working_dataset <- tibble::add_column(working_dataset,
+combined <- tibble::add_column(combined,
                                       v_925_avg,
                                       .after = "v_925_12")
 
@@ -372,110 +215,110 @@ mean_direction <- function(x) {
 }
 
 # (ДОБАВЛЕНО) Добавление столбца со средним суточным направлением ветра на уровне 925 мб
-d_925_avg <- apply(working_dataset[,c(91:92)], 1, mean_direction)
+d_925_avg <- apply(combined[,c(91:92)], 1, mean_direction)
 d_925_avg <- round(d_925_avg, digits = 1)
-working_dataset <- tibble::add_column(working_dataset,
+combined <- tibble::add_column(combined,
                                       d_925_avg,
                                       .after = "d_925_12")
 
 # (ДОБАВЛЕНО) Добавление столбца со средним суточным направлением ветра на уровне станции
-w_direct_avg <- apply(working_dataset[,c(32:39)], 1, mean_direction)
+w_direct_avg <- apply(combined[,c(32:39)], 1, mean_direction)
 w_direct_avg <- round(w_direct_avg, digits = 1)
-working_dataset <- tibble::add_column(working_dataset,
+combined <- tibble::add_column(combined,
                                       w_direct_avg,
                                       .after = "w_direct_21")
 
 # (ДОБАВЛЕНО) Добавление столбца с изменением среднего давления за сутки
-prev_p_station <- working_dataset$p_station_avg[1:1825]
+prev_p_station <- combined$p_station_avg[1:1825]
 prev_p_station <- c(NA, prev_p_station)
-p_station_trend <- working_dataset$p_station_avg - prev_p_station
-working_dataset <- tibble::add_column(working_dataset,
+p_station_trend <- combined$p_station_avg - prev_p_station
+combined <- tibble::add_column(combined,
                                       p_station_trend,
                                       .after = "p_station_avg")
 
 # (ДОБАВЛЕНО) Добавление столбца с изменением температуры воздуха на уровне 925 гПа
 # за сутки за 00 UTC
-prev_t_925_0 <- working_dataset$t_925_0[1:1825]
+prev_t_925_0 <- combined$t_925_0[1:1825]
 prev_t_925_0 <- c(NA, prev_t_925_0)
-t_925_0_trend <- working_dataset$t_925_0 - prev_t_925_0
-working_dataset <- tibble::add_column(working_dataset,
+t_925_0_trend <- combined$t_925_0 - prev_t_925_0
+combined <- tibble::add_column(combined,
                                       t_925_0_trend,
                                       .after = "t_925_12")
 
 # (ДОБАВЛЕНО) Добавление столбца с изменением температуры воздуха на уровне 925 гПа
 # за сутки за 12 UTC
-prev_t_925_12 <- working_dataset$t_925_12[1:1825]
+prev_t_925_12 <- combined$t_925_12[1:1825]
 prev_t_925_12 <- c(NA, prev_t_925_12)
-t_925_12_trend <- working_dataset$t_925_12 - prev_t_925_12
-working_dataset <- tibble::add_column(working_dataset,
+t_925_12_trend <- combined$t_925_12 - prev_t_925_12
+combined <- tibble::add_column(combined,
                                       t_925_12_trend,
                                       .after = "t_925_0_trend")
 
 # (ДОБАВЛЕНО) Добавление столбца с разностью температуры на уровне станции и АТ-925
 # за 00 UTC
-t_diff_0 <- working_dataset$t_0 - working_dataset$t_925_0
+t_diff_0 <- combined$t_0 - combined$t_925_0
 t_diff_0 <- round(t_diff_0, digits = 1)
-working_dataset <- tibble::add_column(working_dataset,
+combined <- tibble::add_column(combined,
                                       t_diff_0,
                                       .after = "t_925_12_trend")
 
 # (ДОБАВЛЕНО) Добавление столбца с разностью температуры на уровне станции и АТ-925
 # за 12 UTC
-t_diff_12 <- working_dataset$t_12 - working_dataset$t_925_12
+t_diff_12 <- combined$t_12 - combined$t_925_12
 hit_diff_12 <- round(t_diff_12, digits = 1)
-working_dataset <- tibble::add_column(working_dataset,
+combined <- tibble::add_column(combined,
                                       t_diff_12,
                                       .after = "t_diff_0")
 
 # (ДОБАВЛЕНО) Добавление столбца с разностью скорости ветра на уровне станции
 # и АТ-925 за 00 UTC (АТ-925 - земля)
-wind_diff_0 <- working_dataset$v_925_0 - working_dataset$w_speed_0
-working_dataset <- tibble::add_column(working_dataset,
+wind_diff_0 <- combined$v_925_0 - combined$w_speed_0
+combined <- tibble::add_column(combined,
                                       wind_diff_0,
                                       .after = "v_925_avg")
 
 # (ДОБАВЛЕНО) Добавление столбца с разностью скорости ветра на уровне станции
 # и АТ-925 за 12 UTC (АТ-925 - земля)
-wind_diff_12 <- working_dataset$v_925_12 - working_dataset$w_speed_12
-working_dataset <- tibble::add_column(working_dataset,
+wind_diff_12 <- combined$v_925_12 - combined$w_speed_12
+combined <- tibble::add_column(combined,
                                       wind_diff_12,
                                       .after = "wind_diff_0")
 
 # (ДОБАВЛЕНО) Добавление столбца с разностью скорости ветра на уровне станции
 # и АТ-925 за 00 UTC (АТ-925 - земля) за предыдущие сутки
-prev_wind_diff_0 <- working_dataset$wind_diff_0[1:1825]
+prev_wind_diff_0 <- combined$wind_diff_0[1:1825]
 prev_wind_diff_0 <- c(NA, prev_wind_diff_0)
-working_dataset <- tibble::add_column(working_dataset,
+combined <- tibble::add_column(combined,
                                       prev_wind_diff_0,
                                       .after = "wind_diff_12")
 
 # (ДОБАВЛЕНО) Добавление столбца с разностью скорости ветра на уровне станции
 # и АТ-925 за 12 UTC (АТ-925 - земля) за предыдущие сутки
-prev_wind_diff_12 <- working_dataset$wind_diff_12[1:1825]
+prev_wind_diff_12 <- combined$wind_diff_12[1:1825]
 prev_wind_diff_12 <- c(NA, prev_wind_diff_12)
-working_dataset <- tibble::add_column(working_dataset,
+combined <- tibble::add_column(combined,
                                       prev_wind_diff_12,
                                       .after = "prev_wind_diff_0")
 
 # (ДОБАВЛЕНО) Добавление столбца с разностью температуры на уровне станции
 # и АТ-925 за 00 UTC за предыдущие сутки
-prev_t_diff_0 <- working_dataset$t_diff_0[1:1825]
+prev_t_diff_0 <- combined$t_diff_0[1:1825]
 prev_t_diff_0 <- c(NA, prev_t_diff_0)
-working_dataset <- tibble::add_column(working_dataset,
+combined <- tibble::add_column(combined,
                                       prev_t_diff_0,
                                       .after = "t_diff_12")
 
 # (ДОБАВЛЕНО) Добавление столбца с разностью температуры на уровне станции
 # и АТ-925 за 12 UTC за предыдущие сутки
-prev_t_diff_12 <- working_dataset$t_diff_12[1:1825]
+prev_t_diff_12 <- combined$t_diff_12[1:1825]
 prev_t_diff_12 <- c(NA, prev_t_diff_12)
-working_dataset <- tibble::add_column(working_dataset,
+combined <- tibble::add_column(combined,
                                       prev_t_diff_12,
                                       .after = "prev_t_diff_0")
 
 #### Сохранение окончательного набора данных ####
 file_path <- paste("C:/Изменение климата и загрязнение атмосферы",
                    "/Разработка прогностической схемы (Вологда)",
-                   "/Datasets/working_dataset.csv",
+                   "/Datasets/combined.csv",
                    sep = "")
-readr::write_csv(working_dataset, file_path)
+readr::write_csv(combined, file_path)
